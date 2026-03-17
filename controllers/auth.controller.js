@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res) => {
   try {
-    const { firstName, email, password } = req.body;
+    const { name, email, password } = req.body;
 
     // Searching if any other user with same email exists
     const userExists = await User.findOne({
@@ -20,9 +20,10 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
-      firstName,
+      name,
       email,
       password: hashedPassword,
+      role: "user",
     });
 
     await newUser.save();
@@ -63,7 +64,7 @@ export const loginUser = async (req, res) => {
     const accessToken = jwt.sign(
       {
         userId: user._id,
-        firstName: user.firstName,
+        name: user.name,
       },
       "This-is-my-jwt-secret",
       { expiresIn: "1h" },
@@ -72,7 +73,7 @@ export const loginUser = async (req, res) => {
     const refreshToken = jwt.sign(
       {
         userId: user._id,
-        firstName: user.firstName,
+        name: user.name,
       },
       "This-is-my-jwt-refresh-secret",
       { expiresIn: "7d" },
@@ -105,7 +106,7 @@ export const refreshToken = (req, res) => {
     const newAccessToken = jwt.sign(
       {
         userId: decoded.userId,
-        firstName: decoded.firstName,
+        name: decoded.name,
       },
       "This-is-my-jwt-secret",
       { expiresIn: "1h" },
@@ -114,7 +115,7 @@ export const refreshToken = (req, res) => {
     const newRefreshToken = jwt.sign(
       {
         userId: decoded.userId,
-        firstName: decoded.firstName,
+        name: decoded.name,
       },
       "This-is-my-jwt-refresh-secret",
       { expiresIn: "7d" },
