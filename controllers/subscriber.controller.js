@@ -45,24 +45,30 @@ export const addSubscriber = async (req, res) => {
 
 // I should be able to update a subscriber's status (PUT)
 export const updateSubsbcriberStatus = async (req, res) => {
-  const { status } = req.body;
-  const { id } = req.params;
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
 
-  const existingSubscriber = await Subscriber.findById(id);
+    const existingSubscriber = await Subscriber.findById(id);
 
-  if (!existingSubscriber) {
-    return res.status(404).json({ message: "Subscriber not found" });
-  }
+    if (!existingSubscriber) {
+      return res.status(404).json({ message: "Subscriber not found" });
+    }
 
-  if (status === "active" || status === "inactive") {
-    existingSubscriber.status = status;
-    await existingSubscriber.save();
-    return res.status(200).json({
-      message: "Subscriber status updated successfully",
-      subscriber: existingSubscriber,
-    });
-  } else {
-    return res.status(400).json({ message: "Invalid status value" });
+    if (status === "active" || status === "inactive") {
+      existingSubscriber.status = status;
+      await existingSubscriber.save();
+      return res.status(200).json({
+        message: "Subscriber status updated successfully",
+        subscriber: existingSubscriber,
+      });
+    } else {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating subscriber status", error });
   }
 };
 
